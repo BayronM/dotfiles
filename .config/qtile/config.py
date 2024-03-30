@@ -30,7 +30,7 @@ keys = [
         [mod, "shift"],
         "Return",
         lazy.spawn(
-            "rofi -show drun -theme ~/.config/rofi/launchers/type-2/style-7.rasi"
+            "rofi -show drun "
         ),
         desc="Run Launcher",
     ),
