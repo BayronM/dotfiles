@@ -21,7 +21,7 @@ spawn_nvidia_GPU_utilization = (
 
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
 myTerm = "alacritty"  # My terminal of choice
-myBrowser = "Firefox"  # My browser of choice
+myBrowser = "brave"  # My browser of choice
 
 keys = [
     ### The essentials
@@ -30,20 +30,14 @@ keys = [
         [mod, "shift"],
         "Return",
         lazy.spawn(
-            "rofi -show drun "
+            "rofi -show drun -theme ~/.config/rofi/launchers/type-1/style-7.rasi"
         ),
         desc="Run Launcher",
     ),
     Key(["control", "shift"], "q", lazy.shutdown()),
-    Key([mod], "b", lazy.spawn(myBrowser), desc="Qutebrowser"),
-    # Key([mod], "/",
-    #     lazy.spawn("dtos-help"),
-    #     desc='DTOS Help'
-    #     ),
     Key([mod], "Tab", lazy.next_layout(), desc="Toggle through layouts"),
     Key([mod, "shift"], "c", lazy.window.kill(), desc="Kill active window"),
     Key([mod, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
-    Key([mod, "shift"], "q", lazy.spawn("dm-logout"), desc="Logout menu"),
     Key(
         ["control", "shift"],
         "e",
