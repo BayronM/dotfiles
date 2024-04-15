@@ -5,8 +5,7 @@ import socket
 import subprocess
 from libqtile import qtile
 from libqtile.config import Click, Drag, Group, KeyChord, Key, Match, Screen
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
+from libqtile import layout, bar, hook
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from typing import List  # noqa: F401
@@ -80,8 +79,8 @@ keys = [
         [mod], "Down", lazy.layout.down(), desc="Move focus down in current stack pane"
     ),
     Key([mod], "Up", lazy.layout.up(), desc="Move focus up in current stack pane"),
-    Key([mod],"Left", lazy.layout.left()),
-    Key([mod],"Right",lazy.layout.right()),
+    Key([mod], "Left", lazy.layout.left()),
+    Key([mod], "Right", lazy.layout.right()),
     Key(
         [mod, "shift"],
         "j",
@@ -139,8 +138,12 @@ keys = [
         lazy.layout.increase_nmaster(),
         desc="Expand window (MonadTall), increase number in master pane (Tile)",
     ),
-    Key([mod], "XF86AudioMute", lazy.layout.normalize(), desc="normalize window size ratios"),
- 
+    Key(
+        [mod],
+        "XF86AudioMute",
+        lazy.layout.normalize(),
+        desc="normalize window size ratios",
+    ),
     Key(
         [mod],
         "m",
@@ -526,9 +529,7 @@ def widgets_left_right():
         ),
         widget.WindowName(foreground=colors[6], background=colors[0], padding=0),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Mpris2(
-            scroll_chars=30,
-            background=colors[0]),
+        widget.Mpris2(scroll_chars=30, background=colors[0]),
         widget.CheckUpdates(
             update_interval=1800,
             distro="Arch_checkupdates",

@@ -56,19 +56,11 @@
 
 (setq-default tab-width 4)
 
-;; Enable minimap at startup for all buffers
-(use-package minimap
-  :ensure t
-  :config
-  ;; Configuraciones personalizadas del minimapa
-  (setq minimap-window-location 'right)
-  (setq minimap-update-delay 0.2)
-  (setq minimap-minimum-width 20)
-  ;; Activar minimapa automáticamente al abrir archivos
-  (add-hook 'find-file-hook 'minimap-mode))
 
 (add-hook 'doom-first-file-hook #'treemacs)
 (add-hook 'projectile-after-switch-project-hook #'treemacs-display-current-project-exclusively)
+
+(setq copilot--indent-warning-printed-p t)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -109,3 +101,25 @@
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+(use-package lsp-pyright
+  :ensure t
+  :defer t
+  :diminish eldoc-mode
+  :hook ((python-mode . (lambda () (require 'lsp-pyright)))
+	 (python-mode . lsp-deferred))
+  :config
+  ;; these hooks can't go in the :hook section since lsp-restart-workspace
+  ;; is not available if lsp isn't active
+  (add-hook 'conda-postactivate-hook (lambda () (lsp-workspace-restart (lsp-session))))
+  (add-hook 'conda-postdeactivate-hook (lambda () (lsp-workspace-restart (lsp-session)))))
+
+(use-package conda
+  :ensure t
+  :defer t
+  :init
+  (setq conda-anaconda-home (expand-file-name "~/miniconda3"))
+  (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
+  :config
+  (conda-env-initialize-interactive-shells)
+  (conda-env-initialize-eshell))
