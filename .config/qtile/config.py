@@ -3,19 +3,13 @@ import os
 import re
 import socket
 import subprocess
-from libqtile import qtile
-from libqtile.config import Click, Drag, Group, KeyChord, Key, Match, Screen
-from libqtile import layout, bar, hook
-from libqtile.lazy import lazy
-from libqtile.utils import guess_terminal
 from typing import List  # noqa: F401
 
-from qtile_extras import widget
-from qtile_extras.widget.decorations import BorderDecoration
-
-spawn_nvidia_GPU_utilization = (
-    "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits"
-)
+from libqtile import bar, hook, layout, qtile
+from libqtile.config import Click, Drag, Group, Key, KeyChord, Match, Screen
+from libqtile.lazy import lazy
+from libqtile.dgroups import simple_key_binder
+from qtile_bar import widgets_list_center, widgets_left_right
 
 
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
@@ -191,70 +185,13 @@ keys = [
         lazy.spawn("amixer sset Master 1+ toggle"),
         desc="Mute/Unmute Volume",
     ),
-    # Emacs programs launched using the key chord CTRL+e followed by 'key'
-    KeyChord(
-        [mod],
+    # Doom Emacs
+    # Control + Shift + e to open Doom Emacs
+    Key(
+        ["control", "shift"],
         "e",
-        [
-            Key(
-                [],
-                "e",
-                lazy.spawn("emacsclient -c -a 'emacs'"),
-                desc="Emacsclient Dashboard",
-            ),
-            Key(
-                [],
-                "a",
-                lazy.spawn(
-                    "emacsclient -c -a 'emacs' --eval '(emms)' --eval '(emms-play-directory-tree \"~/Music/\")'"
-                ),
-                desc="Emacsclient EMMS (music)",
-            ),
-            Key(
-                [],
-                "b",
-                lazy.spawn("emacsclient -c -a 'emacs' --eval '(ibuffer)'"),
-                desc="Emacsclient Ibuffer",
-            ),
-            Key(
-                [],
-                "d",
-                lazy.spawn("emacsclient -c -a 'emacs' --eval '(dired nil)'"),
-                desc="Emacsclient Dired",
-            ),
-            Key(
-                [],
-                "i",
-                lazy.spawn("emacsclient -c -a 'emacs' --eval '(erc)'"),
-                desc="Emacsclient ERC (IRC)",
-            ),
-            Key(
-                [],
-                "n",
-                lazy.spawn("emacsclient -c -a 'emacs' --eval '(elfeed)'"),
-                desc="Emacsclient Elfeed (RSS)",
-            ),
-            Key(
-                [],
-                "s",
-                lazy.spawn("emacsclient -c -a 'emacs' --eval '(eshell)'"),
-                desc="Emacsclient Eshell",
-            ),
-            Key(
-                [],
-                "v",
-                lazy.spawn("emacsclient -c -a 'emacs' --eval '(+vterm/here nil)'"),
-                desc="Emacsclient Vterm",
-            ),
-            Key(
-                [],
-                "w",
-                lazy.spawn(
-                    "emacsclient -c -a 'emacs' --eval '(doom/window-maximize-buffer(eww \"distro.tube\"))'"
-                ),
-                desc="Emacsclient EWW Browser",
-            ),
-        ],
+        lazy.spawn("emacsclient -c -a emacs"),
+        desc="Doom Emacs",
     ),
 ]
 
@@ -265,23 +202,22 @@ groups = [
     Group("Doc⁴", layout="monadtall"),
     Group("File⁵", layout="monadtall"),
     Group("Chat⁶", layout="monadtall"),
-    Group("Mus⁷", layout="monadtall"),
+    Group(
+        "Mus⁷",
+        layout="monadtall",
+        matches=[Match(wm_class=["Deezer", "YouTube Music"])],
+    ),
     Group("Vid⁸", layout="monadtall"),
-    Group("Git⁹", layout="monadtall"),
+    Group("Git⁹", layout="monadtall", persist=False),
 ]
-
-# Allow MODKEY+[0 through 9] to bind to groups, see https://docs.qtile.org/en/stable/manual/config/groups.html
-# MOD4 + index Number : Switch to Group[index]
-# MOD4 + shift + index Number : Send active window to another Group
-from libqtile.dgroups import simple_key_binder
 
 dgroups_key_binder = simple_key_binder("mod4")
 
 layout_theme = {
     "border_width": 2,
-    "margin": 15,
-    "border_focus": "43d902",
-    "border_normal": "1D2330",
+    "margin": 6,
+    "border_focus": "#43d902",
+    "border_normal": "#1D2330",
 }
 
 layouts = [
@@ -301,280 +237,10 @@ layouts = [
     # layout.Floating(**layout_theme),
 ]
 
-colors = [
-    ["#282c34", "#282c34"],
-    ["#1c1f24", "#1c1f24"],
-    ["#dfdfdf", "#dfdfdf"],
-    ["#ff6c6b", "#ff6c6b"],
-    ["#98be65", "#98be65"],
-    ["#da8548", "#da8548"],
-    ["#51afef", "#51afef"],
-    ["#0563b5", "#0563b5"],
-    ["#46d9ff", "#46d9ff"],
-    ["#ffffff", "#ffffff"],
-]
-
-prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
-
-##### DEFAULT WIDGET SETTINGS #####
-widget_defaults = dict(
-    font="Hack Nerd Font Bold", fontsize=12, padding=0, background=colors[2]
-)
-extension_defaults = widget_defaults.copy()
-
-
-def widgets_list_center():
-    widgets_list = [
-        widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
-        widget.Image(
-            filename="~/.config/qtile/img/python.png",
-            scale="False",
-            mouse_callbacks={"Button1": lambda: qtile.cmd_spawn(myTerm)},
-            background=colors[0],
-        ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
-        widget.GroupBox(
-            font="Hack Nerd Font Bold",
-            fontsize=12,
-            margin_y=3,
-            margin_x=0,
-            padding_y=5,
-            padding_x=3,
-            borderwidth=3,
-            active=colors[2],
-            inactive=colors[7],
-            rounded=False,
-            highlight_color=colors[1],
-            highlight_method="block",
-            this_current_screen_border=colors[6],
-            this_screen_border=colors[4],
-            other_current_screen_border=colors[6],
-            other_screen_border=colors[4],
-            foreground=colors[2],
-            background=colors[0],
-        ),
-        widget.TextBox(
-            text="|",
-            font="Ubuntu Mono",
-            background=colors[0],
-            foreground="474747",
-            padding=2,
-            fontsize=14,
-        ),
-        widget.CurrentLayoutIcon(
-            foreground=colors[2],
-            background=colors[0],
-            padding=0,
-            scale=0.7,
-        ),
-        widget.CurrentLayout(foreground=colors[2], background=colors[0], padding=5),
-        widget.TextBox(
-            text="|",
-            font="Ubuntu Mono",
-            background=colors[0],
-            foreground="474747",
-            padding=2,
-            fontsize=14,
-        ),
-        widget.WindowName(foreground=colors[6], background=colors[0], padding=0),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Systray(background=colors[0], padding=5),
-        widget.KeyboardLayout(
-            foreground=colors[8],
-            background=colors[0],
-            padding=5,
-            configured_keyboards=["us", "latam"],
-            decorations=[
-                BorderDecoration(
-                    colour=colors[8],
-                    border_width=[0, 0, 2, 0],
-                    padding_x=5,
-                    padding_y=None,
-                )
-            ],
-        ),
-        widget.TextBox(
-            text="",
-            background=colors[0],
-            foreground="#0068B5",
-            padding=-6,
-            fontsize=40,
-        ),
-        widget.CPU(
-            foreground="#FFFFFF",
-            background="#0068B5",
-            padding=8,
-        ),
-        widget.ThermalSensor(
-            foreground="#FFFFFF",
-            background="#0068B5",
-            padding=8,
-            tag_sensor="Package id 0",
-        ),
-        widget.TextBox(
-            text="",
-            background="#0068B5",
-            foreground="#76b900",
-            padding=-6,
-            fontsize=40,
-        ),
-        # widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.NvidiaSensors(
-            format="GPU {temp}°C",
-            background="#76b900",
-            padding=8,
-            mouse_callbacks={
-                "Button1": lambda: qtile.cmd_spawn(myTerm + "watch -n 1 nvidia-smi")
-            },
-        ),
-        widget.GenPollText(
-            background="#76b900",
-            func=lambda: subprocess.check_output(
-                spawn_nvidia_GPU_utilization, shell=True
-            )
-            .decode("utf-8")
-            .splitlines()[0]
-            + "%",
-            update_interval=5,
-            padding=5,
-            mouse_callbacks={
-                "Button1": lambda: qtile.cmd_spawn(myTerm + " nvidia-smi &")
-            },
-        ),
-        # widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.TextBox(
-            text="",
-            background="#76b900",
-            foreground="#da8548",
-            padding=-6,
-            fontsize=40,
-        ),
-        widget.Memory(
-            foreground=colors[9],
-            background="#da8548",
-            mouse_callbacks={"Button1": lambda: qtile.cmd_spawn(myTerm + " -e bpytop")},
-            format="RAM {MemUsed: .0f} MB/{MemTotal: .0f} MB",
-            padding=8,
-        ),
-        widget.TextBox(
-            text="",
-            background="#da8548",
-            foreground=colors[0],
-            padding=-6,
-            fontsize=40,
-        ),
-        # widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Clock(
-            foreground="#ffffff",
-            background=colors[0],
-            format="%B %d - %H:%M ",
-        ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-    ]
-    return widgets_list
-
-
-def widgets_left_right():
-    widgets_list = [
-        widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
-        widget.Image(
-            filename="~/.config/qtile/icons/python-white.png",
-            scale="False",
-            mouse_callbacks={"Button1": lambda: qtile.cmd_spawn(myTerm)},
-        ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
-        widget.GroupBox(
-            font="Ubuntu Bold",
-            fontsize=9,
-            margin_y=3,
-            margin_x=0,
-            padding_y=5,
-            padding_x=3,
-            borderwidth=3,
-            active=colors[2],
-            inactive=colors[7],
-            rounded=False,
-            highlight_color=colors[1],
-            highlight_method="block",
-            this_current_screen_border=colors[6],
-            this_screen_border=colors[4],
-            other_current_screen_border=colors[6],
-            other_screen_border=colors[4],
-            foreground=colors[2],
-            background=colors[0],
-        ),
-        widget.TextBox(
-            text="|",
-            font="Ubuntu Mono",
-            background=colors[0],
-            foreground="474747",
-            padding=2,
-            fontsize=14,
-        ),
-        widget.CurrentLayoutIcon(
-            custom_icon_paths=[os.path.expanduser("~/.config/qtile/icons")],
-            foreground=colors[2],
-            background=colors[0],
-            padding=0,
-            scale=0.7,
-        ),
-        widget.CurrentLayout(foreground=colors[2], background=colors[0], padding=5),
-        widget.TextBox(
-            text="|",
-            font="Ubuntu Mono",
-            background=colors[0],
-            foreground="474747",
-            padding=2,
-            fontsize=14,
-        ),
-        widget.WindowName(foreground=colors[6], background=colors[0], padding=0),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Mpris2(scroll_chars=30, background=colors[0]),
-        widget.CheckUpdates(
-            update_interval=1800,
-            distro="Arch_checkupdates",
-            display_format="Updates: {updates} ",
-            foreground=colors[5],
-            colour_have_updates=colors[5],
-            colour_no_updates=colors[5],
-            mouse_callbacks={
-                "Button1": lambda: qtile.cmd_spawn(myTerm + " -e sudo pacman -Syu")
-            },
-            padding=5,
-            background=colors[0],
-            decorations=[
-                BorderDecoration(
-                    colour=colors[5],
-                    border_width=[0, 0, 2, 0],
-                    padding_x=5,
-                    padding_y=None,
-                )
-            ],
-        ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Pomodoro(background=colors[0]),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Clock(
-            foreground="#ffffff",
-            background=colors[0],
-            format="%A, %B %d - %H:%M ",
-            decorations=[
-                BorderDecoration(
-                    colour="#ffffff",
-                    border_width=[0, 0, 2, 0],
-                    padding_x=5,
-                    padding_y=None,
-                )
-            ],
-        ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-    ]
-    return widgets_list
-
 
 def init_screens():
     return [
-        Screen(top=bar.Bar(widgets=widgets_list_center(), opacity=1.0, size=20)),
+        Screen(top=bar.Bar(widgets=widgets_list_center(), opacity=0.85, size=28)),
         Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
         Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
     ]
@@ -637,23 +303,10 @@ follow_mouse_focus = True
 bring_front_click = False
 cursor_warp = False
 
-floating_layout = layout.Floating(
-    float_rules=[
-        # Run the utility of `xprop` to see the wm class and name of an X client.
-        # default_float_rules include: utility, notification, toolbar, splash, dialog,
-        # file_progress, confirm, download and error.
-        *layout.Floating.default_float_rules,
-        Match(title="Confirmation"),  # tastyworks exit box
-        Match(title="Qalculate!"),  # qalculate-gtk
-        Match(wm_class="kdenlive"),  # kdenlive
-        Match(wm_class="pinentry-gtk-2"),  # GPG key password entry
-    ]
-)
 auto_fullscreen = True
 focus_on_window_activation = "smart"
 reconfigure_screens = True
 
-# If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
 auto_minimize = True
 
