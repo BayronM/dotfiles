@@ -22,7 +22,7 @@ colors = [
     ["#98be65", "#98be65"],
     ["#da8548", "#da8548"],
     ["#51afef", "#51afef"],
-    ["#0563b5", "#0563b5"],
+    ["#636363", "#636363"],
     ["#46d9ff", "#46d9ff"],
     ["#ffffff", "#ffffff"],
 ]
@@ -40,7 +40,7 @@ decoration_group = {
         RectDecoration(
             radius=4,
             filled=True,
-            padding_y=3,
+            padding_y=5,
             group=True,
             line_color="#07f537",
             line_width=2,
@@ -49,12 +49,9 @@ decoration_group = {
     "padding": 5,
 }
 
-decoration_layout = {
-    "decorations": [
-        RectDecoration(colour="#004040", radius=4, filled=True, padding_y=4, group=True)
-    ],
-    "padding": 1,
-}
+background_default = dict(
+    background=colors[0],
+)
 
 
 def widgets_list_center():
@@ -87,32 +84,12 @@ def widgets_list_center():
             background=colors[0],
             **font_defaults,
         ),
-        widget.TextBox(
-            text="|",
-            background=colors[0],
-            foreground="#474747",
-            **font_defaults,
-        ),
-        widget.CurrentLayoutIcon(
-            foreground=colors[2],
-            background=colors[0],
-            scale=0.5,
-            **decoration_layout,
-        ),
-        widget.CurrentLayout(
-            foreground=colors[2],
-            background=colors[0],
-            **font_defaults,
-            **decoration_layout,
-        ),
-        widget.TextBox(
-            text="|",
-            background=colors[0],
-            foreground="#474747",
-            **font_defaults,
-        ),
+        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.WindowName(
-            foreground=colors[6], background=colors[0], padding=0, **font_defaults
+            foreground=colors[2],
+            background=colors[0],
+            format=" {state}{name}",
+            **font_defaults,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.Systray(background=colors[0], **font_defaults),
@@ -120,6 +97,19 @@ def widgets_list_center():
             background=colors[0],
             **font_defaults,
             configured_keyboards=["us", "latam"],
+        ),
+        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
+        widget.CurrentLayoutIcon(
+            foreground=colors[2],
+            background=colors[0],
+            scale=0.5,
+            **decoration_group,
+        ),
+        widget.CurrentLayout(
+            foreground=colors[2],
+            background=colors[0],
+            **font_defaults,
+            **decoration_group,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.CPU(
@@ -165,8 +155,9 @@ def widgets_list_center():
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
         widget.Memory(
             mouse_callbacks={"Button1": lambda: qtile.cmd_spawn(MY_TERM + " -e btop")},
-            format="RAM {MemUsed: .0f} MB/{MemTotal: .0f} MB",
+            format=" {MemUsed: .00f} MB/{MemTotal: .0f} MB",
             background=colors[0],
+            measure_mem="M",
             **font_defaults,
             **decoration_group,
         ),
@@ -176,6 +167,12 @@ def widgets_list_center():
             background=colors[0],
             **font_defaults,
             **decoration_group,
+        ),
+        widget.Sep(
+            linewidth=0,
+            padding=6,
+            foreground=colors[0],
+            background=colors[0],
         ),
     ]
     return widgets_list
@@ -273,6 +270,11 @@ def widgets_left_right():
                 )
             ],
         ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
+        widget.Sep(
+            linewidth=0,
+            padding=6,
+            foreground=colors[0],
+            background=colors[0],
+        ),
     ]
     return widgets_list

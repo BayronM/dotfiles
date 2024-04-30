@@ -24,6 +24,12 @@
 ;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 ;;
+;;Font Config
+(setq doom-font (font-spec :family "Hack Nerd Font Mono" :size 15 )
+      doom-variable-pitch-font (font-spec :family "Hack Nerd Font Propo" :size 15)
+      doom-big-font (font-spec :family "Hack Nerd Font Mono" :size 25))
+
+;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
 ;; refresh your font settings. If Emacs still can't find your font, it likely
@@ -32,35 +38,18 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-font (font-spec :family "Hack Nerd Font Mono" :size 15 )
-      doom-variable-pitch-font (font-spec :family "Hack Nerd Font Propo" :size 15)
-      doom-big-font (font-spec :family "Hack Nerd Font Mono" :size 25))
-
-(after! doom-themes
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t))
-
 (setq doom-theme 'doom-one)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
 
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 
-(setq-default shell-file-name (executable-find "bash"))
-(setq-default vterm-shell (executable-find "fish"))
-(setq-default explicit-shell-file-name (executable-find "fish"))
 
-(setq-default tab-width 4)
-
-
-(add-hook 'doom-first-file-hook #'treemacs)
-(add-hook 'projectile-after-switch-project-hook #'treemacs-display-current-project-exclusively)
-
-(setq copilot--indent-warning-printed-p t)
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -93,33 +82,54 @@
 ;;
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
-;; accept completion from copilot and fallback to company
-(use-package! copilot
+;;
+
+;; Python config
+(use-package python
+  :hook ((python-mode . company-mode))
+  :mode (("\\.py\\'" . python-mode)))
+
+(use-package conda
+  :ensure t
+  :config
+  (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
+  (setq conda-activate-base-by-default t)
+  )
+
+(add-hook 'conda-postactivate-hook(lambda () (lsp-restart-workspace)))
+
+
+;; company config
+(use-package company
+  :ensure t
+  :config
+  (setq company-idle-delay 0.1)
+  (setq company-minimum-prefix-length 1)
+  )
+
+;;Github Copilot
+
+(use-package copilot
   :hook (prog-mode . copilot-mode)
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)))
-
-(use-package lsp-pyright
-  :ensure t
-  :defer t
-  :diminish eldoc-mode
-  :hook ((python-mode . (lambda () (require 'lsp-pyright)))
-	 (python-mode . lsp-deferred))
+              ("C-<tab>" . 'copilot-accept-completion-by-word))
   :config
-  ;; these hooks can't go in the :hook section since lsp-restart-workspace
-  ;; is not available if lsp isn't active
-  (add-hook 'conda-postactivate-hook (lambda () (lsp-workspace-restart (lsp-session))))
-  (add-hook 'conda-postdeactivate-hook (lambda () (lsp-workspace-restart (lsp-session)))))
+  (setq copilot--indent-warning-printed-p t))
 
-(use-package conda
+
+
+(use-package ein
   :ensure t
-  :defer t
-  :init
-  (setq conda-anaconda-home (expand-file-name "~/miniconda3"))
-  (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
   :config
-  (conda-env-initialize-interactive-shells)
-  (conda-env-initialize-eshell))
+  (setq ein:output-area-inlined-images t)
+  (setq ein:jupyter-server-command (concat conda-env-home-directory "/envs/" conda-env-current-name "/bin/jupyter")))
+
+;; pipenv config
+(use-package pipenv
+  :ensure t
+  :hook (python-mode . pipenv-mode)
+  :config
+  (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
