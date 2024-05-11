@@ -1,20 +1,22 @@
 # -*- coding: utf-8 -*-
 import os
-import re
-import socket
 import subprocess
 from typing import List  # noqa: F401
 
-from libqtile import bar, hook, layout, qtile
-from libqtile.config import Click, Drag, Group, Key, KeyChord, Match, Screen
+from libqtile import bar, hook
+from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.dgroups import simple_key_binder
 from qtile_bar import widgets_list_center, widgets_left_right
 
+##layouts
+from libqtile.layout import xmonad, stack, columns, max, zoomy
+
 
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
-myTerm = "alacritty"  # My terminal of choice
-myBrowser = "brave"  # My browser of choice
+myTerm = "alacritty"  # terminal
+myBrowser = "brave"  # browser
+
 
 keys = [
     ### The essentials
@@ -193,19 +195,27 @@ keys = [
         lazy.spawn("emacsclient -c -a emacs"),
         desc="Doom Emacs",
     ),
+    # open an doom emacs org file in a specific group
+    # Control + Shift + o to open an org file in a specific group
+    Key(
+        ["control", "shift"],
+        "o",
+        lazy.spawn("emacsclient -c -a emacs ~/org/notes.org"),
+        desc="Doom Emacs Org File",
+    ),
 ]
 
 groups = [
     Group("Dev¹", layout="monadtall"),
     Group("Net²", layout="monadtall"),
     Group("Sys³", layout="monadtall"),
-    Group("Doc⁴", layout="monadtall"),
+    Group("Org⁴", layout="monadtall"),
     Group("File⁵", layout="monadtall"),
     Group("Chat⁶", layout="monadtall"),
     Group(
         "Mus⁷",
         layout="monadtall",
-        matches=[Match(wm_class=["Deezer", "YouTube Music"])],
+        matches=[Match(wm_class="Deezer"), Match(wm_class="Spotify")],
     ),
     Group("Vid⁸", layout="monadtall"),
     Group("Git⁹", layout="monadtall", persist=False),
@@ -223,15 +233,15 @@ layout_theme = {
 layouts = [
     # layout.MonadWide(**layout_theme),
     # layout.Bsp(**layout_theme),
-    layout.Stack(stacks=2, **layout_theme),
-    layout.Columns(**layout_theme),
+    stack.Stack(stacks=2, **layout_theme),
+    columns.Columns(**layout_theme),
     # layout.RatioTile(**layout_theme),
     # layout.Tile(shift_windows=True, **layout_theme),
     # layout.VerticalTile(**layout_theme),
     # layout.Matrix(**layout_theme),
-    # layout.Zoomy(**layout_theme),
-    layout.MonadTall(**layout_theme),
-    layout.Max(**layout_theme),
+    zoomy.Zoomy(**layout_theme),
+    xmonad.MonadTall(**layout_theme),
+    max.Max(**layout_theme),
     # layout.Stack(num_stacks=2),
     # layout.RatioTile(**layout_theme),
     # layout.Floating(**layout_theme),
@@ -287,6 +297,12 @@ def switch_screens(qtile):
     qtile.current_screen.set_group(group)
 
 
+# open an app in a specific group
+def spawn_app_in_group(app_name, group_name):
+    lazy.spawn(app_name)
+    lazy.window.togroup(group_name)
+
+
 mouse = [
     Drag(
         [mod],
@@ -317,6 +333,7 @@ auto_minimize = True
 def start_once():
     home = os.path.expanduser("~")
     subprocess.call([home + "/.config/qtile/autostart.sh"])
+    spawn_app_in_group("emacscilent -c -a emacs ~/org/notes.org", "Org⁴")
 
 
 # XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
@@ -328,6 +345,3 @@ def start_once():
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
-
-
-# create a widget that will run the command above and update every 5 seconds

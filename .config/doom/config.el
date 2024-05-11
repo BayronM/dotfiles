@@ -25,9 +25,10 @@
 ;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
 ;;
 ;;Font Config
-(setq doom-font (font-spec :family "Hack Nerd Font Mono" :size 15 )
-      doom-variable-pitch-font (font-spec :family "Hack Nerd Font Propo" :size 15)
-      doom-big-font (font-spec :family "Hack Nerd Font Mono" :size 25))
+(setq doom-font (font-spec :family "Hack Nerd Font Mono" :size 15 ))
+(setq doom-variable-pitch-font (font-spec :family "NotoSans NF" :size 15))
+(setq doom-big-font (font-spec :family "Hack Nerd Font Mono" :size 25))
+(setq doom-serif-font (font-spec :family "NotoSerif NF" :size 15))
 
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
@@ -93,7 +94,6 @@
   :ensure t
   :config
   (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
-  (setq conda-activate-base-by-default t)
   )
 
 (add-hook 'conda-postactivate-hook(lambda () (lsp-restart-workspace)))
@@ -117,7 +117,8 @@
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word))
   :config
-  (setq copilot--indent-warning-printed-p t))
+  (setq copilot--indent-warning-printed-p nil)
+  )
 
 
 
@@ -129,7 +130,23 @@
 
 ;; pipenv config
 (use-package pipenv
-  :ensure t
   :hook (python-mode . pipenv-mode)
-  :config
+  :init
   (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
+
+;; pyvenv config
+(use-package pyvenv
+  :config
+  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "]")))
+  )
+
+(add-hook 'pyvenv-post-activate-hooks 'lsp-restart-workspace)
+
+(after! ispell
+  (setq ispell-dictionary "es"))
+
+(use-package beacon)
+(use-package org-modern
+  :init
+  (add-hook 'org-mode-hook 'org-modern-mode)
+  )

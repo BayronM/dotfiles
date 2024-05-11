@@ -1,5 +1,6 @@
 import os
 import socket
+import copy
 
 from libqtile import qtile
 from libqtile.lazy import lazy
@@ -35,19 +36,27 @@ font_defaults = dict(
 )
 font_defaults = font_defaults.copy()
 
-decoration_group = {
+decoration_defaults = {
     "decorations": [
         RectDecoration(
             radius=4,
             filled=True,
             padding_y=5,
             group=True,
-            line_color="#07f537",
-            line_width=2,
         )
     ],
     "padding": 5,
 }
+
+decoration_cpu = copy.deepcopy(decoration_defaults)
+decoration_cpu["decorations"][0].colour = colors[6]
+
+decoration_memory = copy.deepcopy(decoration_defaults)
+decoration_memory["decorations"][0].colour = colors[5]
+
+decoration_gpu = copy.deepcopy(decoration_defaults)
+decoration_gpu["decorations"][0].colour = colors[4]
+
 
 background_default = dict(
     background=colors[0],
@@ -85,10 +94,14 @@ def widgets_list_center():
             **font_defaults,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.WindowName(
-            foreground=colors[2],
+        widget.TaskList(
             background=colors[0],
-            format=" {state}{name}",
+            borderwidth=0,
+            margin=3,
+            padding=5,
+            max_title_width=0,
+            highlight_method="block",
+            stretch=True,
             **font_defaults,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
@@ -103,23 +116,17 @@ def widgets_list_center():
             foreground=colors[2],
             background=colors[0],
             scale=0.5,
-            **decoration_group,
-        ),
-        widget.CurrentLayout(
-            foreground=colors[2],
-            background=colors[0],
-            **font_defaults,
-            **decoration_group,
+            **decoration_defaults,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.CPU(
             background=colors[0],
             **font_defaults,
-            **decoration_group,
+            **decoration_cpu,
         ),
         widget.ThermalSensor(
             **font_defaults,
-            **decoration_group,
+            **decoration_cpu,
             background=colors[0],
             tag_sensor="Package id 0",
         ),
@@ -128,7 +135,7 @@ def widgets_list_center():
             format="GPU {temp}°C",
             background=colors[0],
             **font_defaults,
-            **decoration_group,
+            **decoration_gpu,
             mouse_callbacks={
                 "Button1": lambda: qtile.cmd_spawn(
                     MY_TERM + " -e watch -n 1 nvidia-smi"
@@ -145,7 +152,7 @@ def widgets_list_center():
             update_interval=5,
             background=colors[0],
             **font_defaults,
-            **decoration_group,
+            **decoration_gpu,
             mouse_callbacks={
                 "Button1": lambda: qtile.cmd_spawn(
                     MY_TERM + " -e watch -n 1 nvidia-smi"
@@ -159,14 +166,14 @@ def widgets_list_center():
             background=colors[0],
             measure_mem="M",
             **font_defaults,
-            **decoration_group,
+            **decoration_memory,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
         widget.Clock(
             format="%B %d - %H:%M ",
             background=colors[0],
             **font_defaults,
-            **decoration_group,
+            **decoration_defaults,
         ),
         widget.Sep(
             linewidth=0,
