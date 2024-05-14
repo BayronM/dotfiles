@@ -6,6 +6,9 @@ from libqtile import qtile
 from libqtile.lazy import lazy
 from qtile_extras import widget
 from qtile_extras.widget.decorations import BorderDecoration, RectDecoration
+from qtile_extras.popup.templates.mpris2 import DEFAULT_LAYOUT
+from qtile_extras.widget.groupbox2 import GroupBoxRule
+
 
 import subprocess
 
@@ -28,6 +31,16 @@ colors = [
     ["#ffffff", "#ffffff"],
 ]
 
+color_palette = [
+    "#577590",
+    "#43aa8b",
+    "#90be6d",
+    "#f9c74f",
+    "#f8961e",
+    "#f9844a",
+    "#f94144",
+]
+
 prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 font_defaults = dict(
@@ -35,6 +48,9 @@ font_defaults = dict(
     fontsize=13,
 )
 font_defaults = font_defaults.copy()
+font_groupbox = font_defaults.copy()
+font_groupbox["fontsize"] = 20
+font_groupbox["font"] = "ShureTechMono Nerd Font"
 
 decoration_defaults = {
     "decorations": [
@@ -49,18 +65,35 @@ decoration_defaults = {
 }
 
 decoration_cpu = copy.deepcopy(decoration_defaults)
-decoration_cpu["decorations"][0].colour = colors[6]
-
-decoration_memory = copy.deepcopy(decoration_defaults)
-decoration_memory["decorations"][0].colour = colors[5]
+decoration_cpu["decorations"][0].colour = color_palette[0]
 
 decoration_gpu = copy.deepcopy(decoration_defaults)
-decoration_gpu["decorations"][0].colour = colors[4]
+decoration_gpu["decorations"][0].colour = color_palette[1]
+
+decoration_memory = copy.deepcopy(decoration_defaults)
+decoration_memory["decorations"][0].colour = color_palette[2]
+
+decoration_clock = copy.deepcopy(decoration_defaults)
+decoration_clock["decorations"][0].colour = colors[0]
 
 
 background_default = dict(
     background=colors[0],
 )
+
+
+groupbox_rules = [
+    GroupBoxRule(
+        block_colour="#98be65",
+        block_corner_radius=4,
+        box_size=30,
+    ).when(screen=GroupBoxRule.SCREEN_THIS),
+    GroupBoxRule(block_colour="#118ab2", block_corner_radius=4, box_size=30).when(
+        screen=GroupBoxRule.SCREEN_OTHER
+    ),
+    GroupBoxRule(text_colour="#ffffff").when(occupied=True),
+    GroupBoxRule(text_colour="#363636").when(occupied=False),
+]
 
 
 def widgets_list_center():
@@ -73,25 +106,11 @@ def widgets_list_center():
             background=colors[0],
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
-        widget.GroupBox(
-            margin_y=3,
-            margin_x=1,
-            padding_y=5,
-            padding_x=3,
-            borderwidth=3,
-            active=colors[2],
-            inactive=colors[7],
-            rounded=True,
-            fontshadow=colors[0],
-            highlight_color=colors[1],
-            highlight_method="block",
-            this_current_screen_border=colors[6],
-            this_screen_border=colors[4],
-            other_current_screen_border=colors[6],
-            other_screen_border=colors[4],
-            foreground=colors[2],
+        widget.GroupBox2(
+            padding_x=6,
+            **font_groupbox,
             background=colors[0],
-            **font_defaults,
+            rules=groupbox_rules,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.TaskList(
@@ -99,19 +118,29 @@ def widgets_list_center():
             borderwidth=0,
             margin=3,
             padding=5,
-            max_title_width=0,
             highlight_method="block",
             stretch=True,
             **font_defaults,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
+        widget.Mpris2(
+            name="Youtube Music",
+            objname="org.mpris.MediaPlayer2.YoutubeMusic",
+            popup_layout=DEFAULT_LAYOUT,
+            **font_defaults,
+            background=colors[0],
+            scroll=True,
+            width=150,
+        ),
+        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.Systray(background=colors[0], **font_defaults),
+        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.KeyboardLayout(
             background=colors[0],
             **font_defaults,
             configured_keyboards=["us", "latam"],
+            **decoration_defaults,
         ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.CurrentLayoutIcon(
             foreground=colors[2],
             background=colors[0],
@@ -169,11 +198,21 @@ def widgets_list_center():
             **decoration_memory,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
+        widget.AnalogueClock(
+            **font_defaults,
+            **background_default,
+            second_size=1,
+            second_length=0.9,
+            minute_length=0.9,
+            adjust_y=-6,
+            face_shape="circle",
+            face_color=colors[0],
+            margin=10,
+        ),
         widget.Clock(
             format="%B %d - %H:%M ",
-            background=colors[0],
+            **background_default,
             **font_defaults,
-            **decoration_defaults,
         ),
         widget.Sep(
             linewidth=0,
@@ -196,7 +235,7 @@ def widgets_left_right():
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
         widget.GroupBox(
             font="Ubuntu Bold",
-            fontsize=9,
+            fontsize=15,
             margin_y=3,
             margin_x=0,
             padding_y=5,
@@ -268,14 +307,8 @@ def widgets_left_right():
             foreground="#ffffff",
             background=colors[0],
             format="%A, %B %d - %H:%M ",
-            decorations=[
-                BorderDecoration(
-                    colour="#ffffff",
-                    border_width=[0, 0, 2, 0],
-                    padding_x=5,
-                    padding_y=None,
-                )
-            ],
+            **font_defaults,
+            **decoration_clock,
         ),
         widget.Sep(
             linewidth=0,

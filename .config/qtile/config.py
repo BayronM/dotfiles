@@ -206,19 +206,23 @@ keys = [
 ]
 
 groups = [
-    Group("Dev¹", layout="monadtall"),
-    Group("Net²", layout="monadtall"),
-    Group("Sys³", layout="monadtall"),
-    Group("Org⁴", layout="monadtall"),
-    Group("File⁵", layout="monadtall"),
-    Group("Chat⁶", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("󰭹", layout="monadtall"),
     Group(
-        "Mus⁷",
+        "",
         layout="monadtall",
-        matches=[Match(wm_class="Deezer"), Match(wm_class="Spotify")],
+        matches=[
+            Match(wm_class="Deezer"),
+            Match(wm_class="Spotify"),
+            Match(wm_class="youtube-music"),
+        ],
     ),
-    Group("Vid⁸", layout="monadtall"),
-    Group("Git⁹", layout="monadtall", persist=False),
+    Group("󰎁", layout="monadtall"),
+    Group("󰊢", layout="monadtall", persist=False),
 ]
 
 dgroups_key_binder = simple_key_binder("mod4")

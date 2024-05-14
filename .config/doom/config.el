@@ -145,8 +145,19 @@
 (after! ispell
   (setq ispell-dictionary "es"))
 
-(use-package beacon)
+(use-package beacon
+  :config
+  (beacon-mode 1)
+  )
 (use-package org-modern
   :init
   (add-hook 'org-mode-hook 'org-modern-mode)
+  )
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+
+(use-package rainbow-mode
+  :hook (prog-mode . rainbow-mode)
   )
