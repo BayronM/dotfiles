@@ -2,7 +2,7 @@ import os
 import socket
 import copy
 
-from libqtile import qtile
+from libqtile import bar, qtile
 from libqtile.lazy import lazy
 from qtile_extras import widget
 from qtile_extras.widget.decorations import BorderDecoration, RectDecoration
@@ -49,7 +49,7 @@ font_defaults = dict(
 )
 font_defaults = font_defaults.copy()
 font_groupbox = font_defaults.copy()
-font_groupbox["fontsize"] = 20
+font_groupbox["fontsize"] = 25
 font_groupbox["font"] = "ShureTechMono Nerd Font"
 
 decoration_defaults = {
@@ -59,22 +59,38 @@ decoration_defaults = {
             filled=True,
             padding_y=5,
             group=True,
+            colour=colors[0],
+            line_width=2,
         )
     ],
     "padding": 5,
 }
 
 decoration_cpu = copy.deepcopy(decoration_defaults)
-decoration_cpu["decorations"][0].colour = color_palette[0]
+decoration_cpu["decorations"][0].line_colour = color_palette[0]
 
 decoration_gpu = copy.deepcopy(decoration_defaults)
-decoration_gpu["decorations"][0].colour = color_palette[1]
+decoration_gpu["decorations"][0].line_colour = color_palette[1]
 
 decoration_memory = copy.deepcopy(decoration_defaults)
-decoration_memory["decorations"][0].colour = color_palette[2]
+decoration_memory["decorations"][0].line_colour = color_palette[2]
 
 decoration_clock = copy.deepcopy(decoration_defaults)
-decoration_clock["decorations"][0].colour = colors[0]
+decoration_clock["decorations"][0].line_colour = colors[0]
+
+decoration_groupbox = {
+    "decorations": [
+        RectDecoration(
+            radius=4,
+            filled=True,
+            padding_y=3,
+            padding_x=0,
+            group=True,
+            colour="#282c34",
+        )
+    ],
+    "padding": 5,
+}
 
 
 background_default = dict(
@@ -84,15 +100,19 @@ background_default = dict(
 
 groupbox_rules = [
     GroupBoxRule(
-        block_colour="#98be65",
-        block_corner_radius=4,
-        box_size=30,
+        block_colour=colors[0][0],
+        block_border_colour="#98be65",
+        block_corner_radius=10,
+        box_size=35,
     ).when(screen=GroupBoxRule.SCREEN_THIS),
-    GroupBoxRule(block_colour="#118ab2", block_corner_radius=4, box_size=30).when(
-        screen=GroupBoxRule.SCREEN_OTHER
-    ),
+    GroupBoxRule(
+        block_colour=colors[0][0],
+        block_border_colour="#118ab2",
+        block_corner_radius=10,
+        box_size=35,
+    ).when(screen=GroupBoxRule.SCREEN_OTHER),
     GroupBoxRule(text_colour="#ffffff").when(occupied=True),
-    GroupBoxRule(text_colour="#363636").when(occupied=False),
+    GroupBoxRule(text_colour="#636363").when(occupied=False),
 ]
 
 
@@ -106,23 +126,32 @@ def widgets_list_center():
             background=colors[0],
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
-        widget.GroupBox2(
-            padding_x=6,
-            **font_groupbox,
-            background=colors[0],
-            rules=groupbox_rules,
-        ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.TaskList(
             background=colors[0],
             borderwidth=0,
             margin=3,
             padding=5,
-            highlight_method="block",
             stretch=True,
             **font_defaults,
         ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
+        widget.Spacer(  # push the widgets to the left
+            length=bar.STRETCH,
+            background=colors[0],
+        ),
+        widget.GroupBox2(
+            padding_x=7,
+            padding_y=0,
+            margin_x=2,
+            margin_y=1,
+            **font_groupbox,
+            background=colors[0],
+            rules=groupbox_rules,
+            **decoration_groupbox,
+        ),
+        widget.Spacer(  # push the widgets to the right
+            length=bar.STRETCH,
+            background=colors[0],
+        ),
         widget.Mpris2(
             name="Youtube Music",
             objname="org.mpris.MediaPlayer2.YoutubeMusic",
@@ -132,8 +161,6 @@ def widgets_list_center():
             scroll=True,
             width=150,
         ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
-        widget.Systray(background=colors[0], **font_defaults),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.KeyboardLayout(
             background=colors[0],
@@ -198,6 +225,8 @@ def widgets_list_center():
             **decoration_memory,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
+        widget.Systray(background=colors[0], **font_defaults),
+        widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.AnalogueClock(
             **font_defaults,
             **background_default,

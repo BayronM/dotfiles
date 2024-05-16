@@ -90,43 +90,33 @@
   :hook ((python-mode . company-mode))
   :mode (("\\.py\\'" . python-mode)))
 
-(use-package conda
-  :ensure t
-  :config
-  (setq conda-env-home-directory (expand-file-name "~/miniconda3"))
-  )
-
-(add-hook 'conda-postactivate-hook(lambda () (lsp-restart-workspace)))
-
-
 ;; company config
 (use-package company
-  :ensure t
   :config
   (setq company-idle-delay 0.1)
   (setq company-minimum-prefix-length 1)
+  )
+(add-hook 'after-init-hook 'global-company-mode)
+
+(use-package company-box
+  :hook (company-mode . company-box-mode)
   )
 
 ;;Github Copilot
 
 (use-package copilot
-  :hook (prog-mode . copilot-mode)
+  :hook ((prog-mode . copilot-mode)
+         (org-mode . copilot-mode))
   :bind (:map copilot-completion-map
               ("<tab>" . 'copilot-accept-completion)
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word))
+
   :config
-  (setq copilot--indent-warning-printed-p nil)
+  (setq copilot--indent-warning-printed-p t)
   )
 
-
-
-(use-package ein
-  :ensure t
-  :config
-  (setq ein:output-area-inlined-images t)
-  (setq ein:jupyter-server-command (concat conda-env-home-directory "/envs/" conda-env-current-name "/bin/jupyter")))
 
 ;; pipenv config
 (use-package pipenv
@@ -143,7 +133,9 @@
 (add-hook 'pyvenv-post-activate-hooks 'lsp-restart-workspace)
 
 (after! ispell
-  (setq ispell-dictionary "es"))
+  (setq ispell-dictionary "en")
+  (setq ispell-alternate-dictionary "es")
+  )
 
 (use-package beacon
   :config
@@ -155,9 +147,22 @@
   )
 
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)
+  :hook ((prog-mode . rainbow-delimiters-mode)
+         (org-mode . rainbow-delimiters-mode)
+         (text-mode . rainbow-delimiters-mode)
+         )
   )
 
 (use-package rainbow-mode
-  :hook (prog-mode . rainbow-mode)
+  :hook org-mode prog-mode
   )
+
+(use-package org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/Roam")
+  :config
+  (org-roam-db-autosync-enable))

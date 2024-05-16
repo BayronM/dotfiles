@@ -7,22 +7,10 @@ TERM = "xterm-256color"
 
 [font]
 size = 12
-
-[font.bold]
-family = "FiraCode Nerd Font Mono"
-style = "Heavy"
-
-[font.italic]
-family = "FiraCode Nerd Font Mono"
-style = "Medium Italic"
-
-[font.bold_italic]
-family = "FiraCode Nerd Font Mono"
-style = "Heavy Italic"
-
-[font.normal]
-family = "FiraCode Nerd Font Mono"
-style = "Regular"
+normal = { family = "FiraCode Nerd Font", style = "Regular" }
+bold = { family = "FiraCode Nerd Font", style = "Bold" }
+italic = { family = "FiraCode Nerd Font", style = "Italic" }
+bold_italic = { family = "FiraCode Nerd Font", style = "Bold Italic" }
 
 
 [colors.primary]
@@ -100,3 +88,6 @@ blue = '#89B4FA' # blue
 magenta = '#F5C2E7' # pink
 cyan = '#94E2D5' # teal
 white = '#BAC2DE' # subtext1
+
+[cursor]
+style = { shape = "Block" }
