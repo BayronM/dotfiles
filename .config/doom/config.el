@@ -30,6 +30,7 @@
 (setq doom-big-font (font-spec :family "Hack Nerd Font Mono" :size 25))
 (setq doom-serif-font (font-spec :family "NotoSerif NF" :size 15))
 
+
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -102,6 +103,9 @@
   :hook (company-mode . company-box-mode)
   )
 
+
+
+
 ;;Github Copilot
 
 (use-package copilot
@@ -114,8 +118,9 @@
               ("C-<tab>" . 'copilot-accept-completion-by-word))
 
   :config
-  (setq copilot--indent-warning-printed-p t)
+  (setq copilot-indent-offset-warning-disable t)
   )
+
 
 
 ;; pipenv config
@@ -166,3 +171,17 @@
   (org-roam-directory "~/Roam")
   :config
   (org-roam-db-autosync-enable))
+(use-package blamer
+  :bind (("s-i" . blamer-show-commit-info))
+  :defer 20
+  :custom
+  (blamer-idle-time 0.3)
+  (blamer-min-offset 70)
+  :custom-face
+  (blamer-face ((t :foreground "#7a88cf"
+                   :background unspecified
+                   :italic t)))
+  :config
+  (setq blamer-view )
+  (global-blamer-mode 1)
+  )

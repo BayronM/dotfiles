@@ -1,3 +1,237 @@
+#+TITLE: Qtile Configuration
+#+AUTHOR: BayronM
+#+LANGUAGE: en
+
+* Table of Contents :TOC:
+- [[#introduction][Introduction]]
+- [[#imports][Imports]]
+- [[#variables][Variables]]
+  - [[#mod-key-and-applications][Mod Key and Applications]]
+- [[#key-bindings][Key Bindings]]
+  - [[#essential-bindings][Essential Bindings]]
+  - [[#monitor-focus-bindings][Monitor Focus Bindings]]
+  - [[#layout-control-bindings][Layout Control Bindings]]
+- [[#groups][Groups]]
+- [[#layouts][Layouts]]
+- [[#screens-and-widgets][Screens and Widgets]]
+- [[#window-management-functions][Window Management Functions]]
+- [[#mouse-bindings][Mouse Bindings]]
+- [[#other-configurations][Other Configurations]]
+- [[#autosart-script][Autosart Script]]
+- [[#qtile-bar-configuration][Qtile bar configuration]]
+  - [[#modules][Modules]]
+  - [[#variables-1][Variables]]
+  - [[#colors-of-the-bar][Colors of the bar]]
+  - [[#font-and-decorationqtile_extras][Font and decoration(qtile_extras)]]
+  - [[#groupbox-rules][GroupBox rules]]
+  - [[#main-screen-widgets][Main screen widgets]]
+  - [[#additional-screen-widgets][Additional screen widgets]]
+
+* Introduction
+  This file contains the configuration for Qtile window manager. It is divided into sections with detailed explanations.
+
+* Imports
+#+BEGIN_SRC python :tangle config.py
+import os
+import subprocess
+from typing import List
+
+from libqtile import bar, hook
+from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.lazy import lazy
+from libqtile.dgroups import simple_key_binder
+from qtile_bar import widgets_list_center, widgets_left_right
+
+##layouts
+from libqtile.layout import xmonad, stack, columns, max, zoomy
+#+END_SRC
+
+* Variables
+** Mod Key and Applications
+#+BEGIN_SRC python :tangle config.py
+mod = "mod4"  # Sets mod key to SUPER/WINDOWS
+myTerm = "alacritty"  # terminal
+myBrowser = "brave"  # browser
+  #+END_SRC
+
+* Key Bindings
+** Essential Bindings
+#+BEGIN_SRC python :tangle config.py
+keys = [
+    Key([mod], "Return", lazy.spawn(myTerm), desc="Launches My Terminal"),
+    Key([mod, "shift"], "Return", lazy.spawn("rofi -show drun -theme ~/.config/rofi/launchers/type-1/style-7.rasi"), desc="Run Launcher"),
+    Key(["control", "shift"], "q", lazy.shutdown()),
+    Key([mod], "Tab", lazy.next_layout(), desc="Toggle through layouts"),
+    Key([mod, "shift"], "c", lazy.window.kill(), desc="Kill active window"),
+    Key([mod, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
+    Key(["control", "shift"], "e", lazy.spawn("emacsclient -c -a emacs"), desc="Doom Emacs"),
+]
+#+END_SRC
+
+** Monitor Focus Bindings
+#+BEGIN_SRC python :tangle config.py
+keys += [
+    Key([mod], "w", lazy.to_screen(0), desc="Keyboard focus to monitor 1"),
+    Key([mod], "e", lazy.to_screen(1), desc="Keyboard focus to monitor 2"),
+    Key([mod], "r", lazy.to_screen(2), desc="Keyboard focus to monitor 3"),
+]
+#+END_SRC
+
+** Layout Control Bindings
+#+BEGIN_SRC python :tangle config.py
+keys += [
+    Key([mod], "j", lazy.layout.down(), desc="Move focus down in current stack pane"),
+    Key([mod], "k", lazy.layout.up(), desc="Move focus up in current stack pane"),
+    Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move windows down in current stack"),
+    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move windows up in current stack"),
+    Key([mod], "h", lazy.layout.shrink(), lazy.layout.decrease_nmaster(), desc="Shrink window (MonadTall)"),
+    Key([mod], "l", lazy.layout.grow(), lazy.layout.increase_nmaster(), desc="Expand window (MonadTall)"),
+    Key([mod], "n", lazy.layout.normalize(), desc="Normalize window size ratios"),
+    Key([mod], "m", lazy.layout.maximize(), desc="Toggle window between minimum and maximum sizes"),
+    Key([mod, "shift"], "f", lazy.window.toggle_floating(), desc="Toggle floating"),
+    Key([mod], "f", lazy.window.toggle_fullscreen(), desc="Toggle fullscreen"),
+    Key([mod, "shift"], "Tab", lazy.layout.rotate(), lazy.layout.flip(), desc="Switch which side main pane occupies (XmonadTall)"),
+    Key([mod], "space", lazy.layout.next(), desc="Switch window focus to other pane(s) of stack"),
+    Key([mod, "shift"], "space", lazy.layout.toggle_split(), desc="Toggle between split and unsplit sides of stack"),
+]
+#+END_SRC
+
+* Groups
+#+BEGIN_SRC python :tangle config.py
+groups = [
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("", layout="monadtall"),
+    Group("󰉋", layout="monadtall"),
+    Group("󰭹", layout="monadtall"),
+    Group("󰎄", layout="monadtall", matches=[Match(wm_class="Deezer"), Match(wm_class="Spotify"), Match(wm_class="youtube-music")]),
+    Group("󰗃", layout="monadtall"),
+    Group("󰊢", layout="monadtall", persist=False),
+]
+
+dgroups_key_binder = simple_key_binder("mod4")
+#+END_SRC
+
+* Layouts
+#+BEGIN_SRC python :tangle config.py
+layout_theme = {
+    "border_width": 2,
+    "margin": 6,
+    "border_focus": "#43d902",
+    "border_normal": "#1D2330",
+}
+
+layouts = [
+    stack.Stack(stacks=2, **layout_theme),
+    columns.Columns(**layout_theme),
+    zoomy.Zoomy(**layout_theme),
+    xmonad.MonadTall(**layout_theme),
+    max.Max(**layout_theme),
+]
+#+END_SRC
+
+* Screens and Widgets
+#+BEGIN_SRC python :tangle config.py
+def init_screens():
+  return [
+    Screen(top=bar.Bar(widgets=widgets_list_center(), opacity=0.85, size=32, margin=6)),
+    Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
+    Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
+  ]
+
+if __name__ in ["config", "__main__"]:
+  screens = init_screens()
+  widgets_list = widgets_list_center()
+  widgets_screen1 = widgets_left_right()
+  widgets_screen2 = widgets_left_right()
+#+END_SRC
+
+* Window Management Functions
+#+BEGIN_SRC python :tangle config.py
+def window_to_prev_group(qtile):
+  if qtile.currentWindow is not None:
+    i = qtile.groups.index(qtile.currentGroup)
+    qtile.currentWindow.togroup(qtile.groups[i - 1].name)
+
+def window_to_next_group(qtile):
+  if qtile.currentWindow is not None:
+    i = qtile.groups.index(qtile.currentGroup)
+    qtile.currentWindow.togroup(qtile.groups[i + 1].name)
+
+def window_to_previous_screen(qtile):
+  i = qtile.screens.index(qtile.current_screen)
+  if i != 0:
+    group = qtile.screens[i - 1].group.name
+    qtile.current_window.togroup(group)
+
+def window_to_next_screen(qtile):
+  i = qtile.screens.index(qtile.current_screen)
+  if i + 1 != len(qtile.screens):
+    group = qtile.screens[i + 1].group.name
+    qtile.current_window.togroup(group)
+
+def switch_screens(qtile):
+  i = qtile.screens.index(qtile.current_screen)
+  group = qtile.screens[i - 1].group
+  qtile.current_screen.set_group(group)
+
+# open an app in a specific group
+def spawn_app_in_group(app_name, group_name):
+  lazy.spawn(app_name)
+  lazy.window.togroup(group_name)
+#+END_SRC
+
+* Mouse Bindings
+#+BEGIN_SRC python :tangle config.py
+mouse = [
+    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
+    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Click([mod], "Button2", lazy.window.bring_to_front()),
+]
+  #+END_SRC
+
+* Other Configurations
+#+BEGIN_SRC python :tangle config.py
+dgroups_app_rules = []  # type: List
+follow_mouse_focus = True
+bring_front_click = False
+cursor_warp = False
+
+auto_fullscreen = True
+focus_on_window_activation = "smart"
+reconfigure_screens = True
+auto_minimize = True
+
+@hook.subscribe.startup_once
+def start_once():
+    home = os.path.expanduser("~")
+    subprocess.call([home + "/.config/qtile/autostart.sh"])
+    spawn_app_in_group("emacsclient -c -a emacs ~/org/notes.org", "Org⁴")
+
+wmname = "LG3D"
+#+END_SRC
+
+* Autosart Script
+#+BEGIN_SRC sh :tangle ~/.config/qtile/autostart.sh
+
+#!/bin/sh
+picom --backend glx  &
+flameshot &
+/usr/bin/emacs --daemon &
+variety &
+nm-applet &
+blueberry-tray &
+
+
+#+END_SRC
+
+* Qtile bar configuration
+This is my bar configuration for qtile, I use two or three screens, so I have two functions to create the widgets for the bar, one for the main screen and another for the additional screens. I use the qtile_extras library to create the widgets, you can find the library in the following link: https://qtile-extras.readthedocs.io/en/stable/index.html
+
+
+** Modules
+#+BEGIN_SRC python :tangle qtile_bar.py
 import os
 import socket
 import copy
@@ -10,12 +244,18 @@ from qtile_extras.popup.templates.mpris2 import DEFAULT_LAYOUT
 from qtile_extras.widget.groupbox2 import GroupBoxRule
 
 import subprocess
+#+END_SRC
 
+** Variables
+#+BEGIN_SRC python :tangle qtile_bar.py
 MY_TERM = "alacritty"
 spawn_nvidia_GPU_utilization = (
     "nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits"
 )
+#+END_SRC
 
+** Colors of the bar
+#+BEGIN_SRC python :tangle qtile_bar.py
 colors = [
     ["#282c34", "#282c34"],
     ["#1c1f24", "#1c1f24"],
@@ -38,7 +278,10 @@ color_palette = [
     "#f9844a",
     "#f94144",
 ]
+#+END_SRC
 
+** Font and decoration(qtile_extras)
+#+BEGIN_SRC python :tangle qtile_bar.py
 prompt = "{0}@{1}: ".format(os.environ["USER"], socket.gethostname())
 
 font_defaults = dict(
@@ -93,7 +336,10 @@ decoration_groupbox = {
 background_default = dict(
     background=colors[0],
 )
+#+END_SRC
 
+** GroupBox rules
+#+BEGIN_SRC python :tangle qtile_bar.py
 groupbox_rules = [
     GroupBoxRule(
         block_colour=colors[0][0],
@@ -110,7 +356,10 @@ groupbox_rules = [
     GroupBoxRule(text_colour="#ffffff").when(occupied=True),
     GroupBoxRule(text_colour="#636363").when(occupied=False),
 ]
+#+END_SRC
 
+** Main screen widgets
+#+BEGIN_SRC python :tangle qtile_bar.py
 def widgets_list_center():
     widgets_list = [
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
@@ -127,7 +376,7 @@ def widgets_list_center():
             margin=3,
             padding=5,
             stretch=True,
-            **font_defaults,
+            ,**font_defaults,
         ),
         widget.Spacer(
             length=bar.STRETCH,
@@ -138,10 +387,10 @@ def widgets_list_center():
             padding_y=0,
             margin_x=2,
             margin_y=1,
-            **font_groupbox,
+            ,**font_groupbox,
             background=colors[0],
             rules=groupbox_rules,
-            **decoration_groupbox,
+            ,**decoration_groupbox,
         ),
         widget.Spacer(
             length=bar.STRETCH,
@@ -151,7 +400,7 @@ def widgets_list_center():
             name="Youtube Music",
             objname="org.mpris.MediaPlayer2.YoutubeMusic",
             popup_layout=DEFAULT_LAYOUT,
-            **font_defaults,
+            ,**font_defaults,
             background=colors[0],
             scroll=True,
             width=150,
@@ -159,25 +408,25 @@ def widgets_list_center():
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.KeyboardLayout(
             background=colors[0],
-            **font_defaults,
+            ,**font_defaults,
             configured_keyboards=["us", "latam"],
-            **decoration_defaults,
+            ,**decoration_defaults,
         ),
         widget.CurrentLayoutIcon(
             foreground=colors[2],
             background=colors[0],
             scale=0.5,
-            **decoration_defaults,
+            ,**decoration_defaults,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.CPU(
             background=colors[0],
-            **font_defaults,
-            **decoration_cpu,
+            ,**font_defaults,
+            ,**decoration_cpu,
         ),
         widget.ThermalSensor(
-            **font_defaults,
-            **decoration_cpu,
+            ,**font_defaults,
+            ,**decoration_cpu,
             background=colors[0],
             tag_sensor="Package id 0",
         ),
@@ -185,8 +434,8 @@ def widgets_list_center():
         widget.NvidiaSensors(
             format="GPU {temp}°C",
             background=colors[0],
-            **font_defaults,
-            **decoration_gpu,
+            ,**font_defaults,
+            ,**decoration_gpu,
             mouse_callbacks={
                 "Button1": lambda: qtile.cmd_spawn(
                     MY_TERM + " -e watch -n 1 nvidia-smi"
@@ -202,8 +451,8 @@ def widgets_list_center():
             + "%",
             update_interval=5,
             background=colors[0],
-            **font_defaults,
-            **decoration_gpu,
+            ,**font_defaults,
+            ,**decoration_gpu,
             mouse_callbacks={
                 "Button1": lambda: qtile.cmd_spawn(
                     MY_TERM + " -e watch -n 1 nvidia-smi"
@@ -216,15 +465,15 @@ def widgets_list_center():
             format=" {MemUsed: .00f} MB/{MemTotal: .0f} MB",
             background=colors[0],
             measure_mem="M",
-            **font_defaults,
-            **decoration_memory,
+            ,**font_defaults,
+            ,**decoration_memory,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
         widget.Systray(background=colors[0], **font_defaults),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0], background=colors[0]),
         widget.AnalogueClock(
-            **font_defaults,
-            **background_default,
+            ,**font_defaults,
+            ,**background_default,
             second_size=1,
             second_length=0.9,
             minute_length=0.9,
@@ -235,8 +484,8 @@ def widgets_list_center():
         ),
         widget.Clock(
             format="%B %d - %H:%M ",
-            **background_default,
-            **font_defaults,
+            ,**background_default,
+            ,**font_defaults,
         ),
         widget.Sep(
             linewidth=0,
@@ -246,7 +495,10 @@ def widgets_list_center():
         ),
     ]
     return widgets_list
+#+END_SRC
 
+** Additional screen widgets
+#+BEGIN_SRC python :tangle qtile_bar.py
 def widgets_left_right():
     widgets_list = [
         widget.Sep(linewidth=0, padding=6, foreground=colors[2], background=colors[0]),
@@ -330,8 +582,8 @@ def widgets_left_right():
             foreground="#ffffff",
             background=colors[0],
             format="%A, %B %d - %H:%M ",
-            **font_defaults,
-            **decoration_clock,
+            ,**font_defaults,
+            ,**decoration_clock,
         ),
         widget.Sep(
             linewidth=0,
@@ -341,3 +593,4 @@ def widgets_left_right():
         ),
     ]
     return widgets_list
+#+END_SRC
