@@ -1,0 +1,17 @@
+#+title: Dotfiles Repository
+#+author: BayronM
+
+* Dotfiles Repository
+
+Welcome to my dotfiles repository! Here, you'll find my personal collection of configuration files (dotfiles) for various tools and software I use. These dotfiles are designed to help streamline my development environment and maintain consistency across different machines.
+
+[[file:img/desktop.png]]
+
+
+** Configs included
+
+ - [[file:.config/doom][Doom Emacs]]
+ - [[file:.config/fish][Alacritty]]
+ - [[file:.config/fish][Fish]]
+ - [[file:.config/qtile/README.org][Qtile]]
+ - [[file:.config/picom][Picom]]

@@ -19,7 +19,7 @@
 - [[#other-configurations][Other Configurations]]
 - [[#autosart-script][Autosart Script]]
 - [[#qtile-bar-configuration][Qtile bar configuration]]
-  - [[#modules][Modules]]
+  - [[#import-modules][Import Modules]]
   - [[#variables-1][Variables]]
   - [[#colors-of-the-bar][Colors of the bar]]
   - [[#font-and-decorationqtile_extras][Font and decoration(qtile_extras)]]
@@ -230,7 +230,7 @@ blueberry-tray &
 This is my bar configuration for qtile, I use two or three screens, so I have two functions to create the widgets for the bar, one for the main screen and another for the additional screens. I use the qtile_extras library to create the widgets, you can find the library in the following link: https://qtile-extras.readthedocs.io/en/stable/index.html
 
 
-** Modules
+** Import Modules
 #+BEGIN_SRC python :tangle qtile_bar.py
 import os
 import socket
