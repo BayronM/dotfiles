@@ -78,7 +78,7 @@ layouts = [
 
 def init_screens():
   return [
-    Screen(top=bar.Bar(widgets=widgets_list_center(), opacity=0.85, size=32, margin=6)),
+    Screen(top=bar.Bar(widgets=widgets_list_center(), background="#00000000", size=32, margin=6)),
     Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
     Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
   ]
