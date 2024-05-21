@@ -23,6 +23,7 @@ keys = [
     Key([mod, "shift"], "c", lazy.window.kill(), desc="Kill active window"),
     Key([mod, "shift"], "r", lazy.restart(), desc="Restart Qtile"),
     Key(["control", "shift"], "e", lazy.spawn("emacsclient -c -a emacs"), desc="Doom Emacs"),
+    Key([mod,"shift"], "s", lazy.spawn("flameshot gui"), desc="Screenshot tool"),
 ]
 
 keys += [
@@ -45,6 +46,35 @@ keys += [
     Key([mod, "shift"], "Tab", lazy.layout.rotate(), lazy.layout.flip(), desc="Switch which side main pane occupies (XmonadTall)"),
     Key([mod], "space", lazy.layout.next(), desc="Switch window focus to other pane(s) of stack"),
     Key([mod, "shift"], "space", lazy.layout.toggle_split(), desc="Toggle between split and unsplit sides of stack"),
+    Key(
+        [mod],
+        "XF86AudioLowerVolume",
+        lazy.layout.shrink(),
+        lazy.layout.decrease_nmaster(),
+        desc="Shrink window (MonadTall), decrease number in master pane (Tile)",
+    ),
+    Key(
+        [mod],
+        "XF86AudioRaiseVolume",
+        lazy.layout.grow(),
+        lazy.layout.increase_nmaster(),
+        desc="Expand window (MonadTall), increase number in master pane (Tile)",
+    ),
+    Key(
+        [mod],
+        "XF86AudioMute",
+        lazy.layout.normalize(),
+        desc="normalize window size ratios",
+    )
+]
+
+keys += [
+    Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse set Master 1+ toggle")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -D pulse sset Master 2%-")),
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -D pulse sset Master 2%+")),
+    Key([], "XF86AudioPlay", lazy.spawn("playerctl play-pause")),
+    Key([], "XF86AudioNext", lazy.spawn("playerctl next")),
+    Key([], "XF86AudioPrev", lazy.spawn("playerctl previous")),
 ]
 
 groups = [

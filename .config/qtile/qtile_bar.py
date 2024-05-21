@@ -61,7 +61,7 @@ decoration_defaults = {
             line_width=2,
         )
     ],
-    "padding": 5,
+    "padding": 7,
 }
 
 decoration_cpu = copy.deepcopy(decoration_defaults)
@@ -79,6 +79,9 @@ decoration_clock["decorations"][0].line_colour = color_palette[3]
 decoration_mpris = copy.deepcopy(decoration_defaults)
 decoration_mpris["decorations"][0].line_colour = "#FF0000"
 
+decoration_image = copy.deepcopy(decoration_defaults)
+decoration_image["decorations"][0].line_width = 0
+
 
 decoration_groupbox = {
     "decorations": [
@@ -89,7 +92,7 @@ decoration_groupbox = {
             padding_x=0,
             group=True,
             colour="#282c34",
-            extrawidth=30,
+            extrawidth=5,
         )
     ],
     "padding": 5,
@@ -101,13 +104,13 @@ background_default = dict(
 
 groupbox_rules = [
     GroupBoxRule(
-        block_colour=colors[0][0],
+        block_colour="#98be65",
         block_border_colour="#98be65",
         block_corner_radius=10,
         box_size=35,
     ).when(screen=GroupBoxRule.SCREEN_THIS),
     GroupBoxRule(
-        block_colour=colors[0][0],
+        block_colour="#118ab2",
         block_border_colour="#118ab2",
         block_corner_radius=10,
         box_size=35,
@@ -123,7 +126,7 @@ def widgets_list_center():
             filename="~/.config/qtile/img/arch_logo.png",
             scale=True,
             mouse_callbacks={"Button1": lazy.spawn("oblogout")},
-            background=colors[0],
+            **decoration_image,
         ),
         widget.Sep(linewidth=0, padding=12, faoreground=colors[2]),
         widget.Mpris2(
@@ -151,8 +154,7 @@ def widgets_list_center():
         widget.Spacer(
             length=bar.STRETCH,
         ),
-
-        widget.Systray(**font_defaults),
+        widget.ALSAWidget(mode="bar", update_interval=0.1,**decoration_defaults,step=1),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0]),
         widget.KeyboardLayout(
             **font_defaults,
@@ -210,7 +212,11 @@ def widgets_list_center():
             **decoration_memory,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2]),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0]),
+        widget.Bluetooth(**decoration_clock,fmt="󰂯",font="ShureTechMono Nerd Font Bold",
+        fontsize=20,foreground=colors[6]
+        ),
+        widget.StatusNotifier(
+            **decoration_clock, icon_size=20),
         widget.AnalogueClock(
             **font_defaults,
             **decoration_clock,
