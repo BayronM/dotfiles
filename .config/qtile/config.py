@@ -11,6 +11,9 @@ from qtile_bar import widgets_list_center, widgets_left_right
 ##layouts
 from libqtile.layout import xmonad, stack, columns, max, zoomy
 
+#font awesome icons
+import fontawesome as fa
+
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
 myTerm = "alacritty"  # terminal
 myBrowser = "brave"  # browser
@@ -78,15 +81,15 @@ keys += [
 ]
 
 groups = [
-    Group("", layout="monadtall"),
-    Group("", layout="monadtall"),
-    Group("", layout="monadtall"),
-    Group("", layout="monadtall"),
-    Group("󰉋", layout="monadtall"),
-    Group("󰭹", layout="monadtall"),
-    Group("󰎄", layout="monadtall", matches=[Match(wm_class="Deezer"), Match(wm_class="Spotify"), Match(wm_class="youtube-music")]),
-    Group("󰗃", layout="monadtall"),
-    Group("󰊢", layout="monadtall", persist=False),
+    Group("Dev",label=" " ,layout="monadtall"),
+    Group("Net",label=" ", layout="monadtall"), # brave icon from font awesome
+    Group("Term",label=" ", layout="monadtall"),
+    Group("Org",label=" ", layout="monadtall"),
+    Group("File",label=" ", layout="monadtall"),
+    Group("Chat",label=" ", layout="monadtall"),
+    Group("Mus",label=" ", layout="monadtall", matches=[Match(wm_class="Deezer"), Match(wm_class="Spotify"), Match(wm_class="youtube-music")]),
+    Group("Vid",label=" ", layout="monadtall"),
+    Group("Git",label=" ", layout="monadtall", persist=False),
 ]
 
 dgroups_key_binder = simple_key_binder("mod4")

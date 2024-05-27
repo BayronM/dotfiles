@@ -8,6 +8,10 @@ from qtile_extras import widget
 from qtile_extras.widget.decorations import BorderDecoration, RectDecoration
 from qtile_extras.popup.templates.mpris2 import DEFAULT_LAYOUT
 from qtile_extras.widget.groupbox2 import GroupBoxRule
+from xdg import IconTheme
+from xdg import Config as xdg_config
+
+
 
 import subprocess
 
@@ -48,7 +52,7 @@ font_defaults = dict(
 font_defaults = font_defaults.copy()
 font_groupbox = font_defaults.copy()
 font_groupbox["fontsize"] = 25
-font_groupbox["font"] = "ShureTechMono Nerd Font"
+font_groupbox["font"] = "Font Awesome 6 Brands"
 
 decoration_defaults = {
     "decorations": [
@@ -93,6 +97,7 @@ decoration_groupbox = {
             group=True,
             colour="#282c34",
             extrawidth=5,
+
         )
     ],
     "padding": 5,
@@ -102,21 +107,56 @@ background_default = dict(
     background=colors[0],
 )
 
+xdg_config.icon_theme = "Papirus"
+def get_icon_path(icon_name):
+    return IconTheme.getIconPath(icon_name, size=32)
+
+def icon_rules(rule, box):
+    if box.group.name == "Dev":
+        rule.image = get_icon_path("emacs")
+    elif box.group.name == "Net":
+        rule.image = get_icon_path("brave")
+    elif box.group.name == "Term":
+        rule.image = get_icon_path("Alacritty")
+    elif box.group.name == "Org":
+        rule.image = get_icon_path("text-org")
+    elif box.group.name == "File":
+        rule.image = get_icon_path("folder")
+    elif box.group.name == "Chat":
+        rule.image = get_icon_path("discord")
+    elif box.group.name == "Mus":
+        rule.image = get_icon_path("youtube-music")
+    elif box.group.name == "Vid":
+        rule.image = get_icon_path("mpv")
+    elif box.group.name == "Git":
+        rule.image = get_icon_path("git")
+
+
+    return True
+
 groupbox_rules = [
     GroupBoxRule(
-        block_colour="#98be65",
-        block_border_colour="#98be65",
-        block_corner_radius=10,
-        box_size=35,
+        line_colour="#98be65",
+        line_width=6,
     ).when(screen=GroupBoxRule.SCREEN_THIS),
     GroupBoxRule(
-        block_colour="#118ab2",
-        block_border_colour="#118ab2",
-        block_corner_radius=10,
-        box_size=35,
+        line_colour="#118ab2",
+        line_width=4,
     ).when(screen=GroupBoxRule.SCREEN_OTHER),
-    GroupBoxRule(text_colour="#ffffff").when(occupied=True),
-    GroupBoxRule(text_colour="#636363").when(occupied=False),
+    GroupBoxRule().when(func=icon_rules),
+    GroupBoxRule(
+        line_colour="#636363",
+        line_width=4,
+    ).when(occupied=False),
+    GroupBoxRule(
+        line_colour="#f94144",
+        line_width=4,
+    ).when(urgent=True),
+    GroupBoxRule(
+        line_colour="#ffffff",
+        line_width=4,
+    ).when(occupied=True),
+
 ]
 
 def widgets_list_center():
@@ -128,7 +168,7 @@ def widgets_list_center():
             mouse_callbacks={"Button1": lazy.spawn("oblogout")},
             **decoration_image,
         ),
-        widget.Sep(linewidth=0, padding=12, faoreground=colors[2]),
+        widget.Sep(linewidth=0, padding=12, foreground=colors[2]),
         widget.Mpris2(
             name="Youtube Music",
             objname="org.mpris.MediaPlayer2.YoutubeMusic",
@@ -136,9 +176,8 @@ def widgets_list_center():
             **font_defaults,
             **decoration_mpris,
             scroll=True,
-            width=200,
+            width=250,
         ),
-
         widget.Spacer(
             length=bar.STRETCH,
         ),
@@ -147,14 +186,20 @@ def widgets_list_center():
             padding_y=0,
             margin_x=2,
             margin_y=1,
-            **font_groupbox,
             rules=groupbox_rules,
+            **font_groupbox,
             **decoration_groupbox,
         ),
         widget.Spacer(
             length=bar.STRETCH,
         ),
-        widget.ALSAWidget(mode="bar", update_interval=0.1,**decoration_defaults,step=1),
+        widget.ALSAWidget(
+            mode="bar",
+            update_interval=0.1,
+            **decoration_defaults,
+            step=1,
+            **font_defaults,
+        ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[0]),
         widget.KeyboardLayout(
             **font_defaults,
@@ -176,7 +221,7 @@ def widgets_list_center():
             **decoration_cpu,
             tag_sensor="Package id 0",
         ),
-        widget.Sep(linewidth=0, padding=6, foreground=colors[0] ),
+        widget.Sep(linewidth=0, padding=6, foreground=colors[0]),
         widget.NvidiaSensors(
             format="GPU {temp}°C",
             **font_defaults,
@@ -212,11 +257,14 @@ def widgets_list_center():
             **decoration_memory,
         ),
         widget.Sep(linewidth=0, padding=6, foreground=colors[2]),
-        widget.Bluetooth(**decoration_clock,fmt="󰂯",font="ShureTechMono Nerd Font Bold",
-        fontsize=20,foreground=colors[6]
+        widget.Bluetooth(
+            **decoration_clock,
+            fmt="󰂯",
+            font="ShureTechMono Nerd Font Bold",
+            fontsize=20,
+            foreground=colors[6],
         ),
-        widget.StatusNotifier(
-            **decoration_clock, icon_size=20),
+        widget.StatusNotifier(**decoration_clock, icon_size=20),
         widget.AnalogueClock(
             **font_defaults,
             **decoration_clock,
