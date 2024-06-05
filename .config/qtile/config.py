@@ -11,9 +11,6 @@ from qtile_bar import widgets_list_center, widgets_left_right
 ##layouts
 from libqtile.layout import xmonad, stack, columns, max, zoomy
 
-#font awesome icons
-import fontawesome as fa
-
 mod = "mod4"  # Sets mod key to SUPER/WINDOWS
 myTerm = "alacritty"  # terminal
 myBrowser = "brave"  # browser
@@ -55,7 +52,7 @@ keys += [
         lazy.layout.shrink(),
         lazy.layout.decrease_nmaster(),
         desc="Shrink window (MonadTall), decrease number in master pane (Tile)",
-    ),
+    ), # use the Knob to shrink the window
     Key(
         [mod],
         "XF86AudioRaiseVolume",
@@ -109,18 +106,11 @@ layouts = [
     max.Max(**layout_theme),
 ]
 
-def init_screens():
-  return [
+screens = [
     Screen(top=bar.Bar(widgets=widgets_list_center(), background="#00000000", size=32, margin=6)),
-    Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
-    Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
+    #Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
+    #Screen(top=bar.Bar(widgets=widgets_left_right(), opacity=1.0, size=20)),
   ]
-
-if __name__ in ["config", "__main__"]:
-  screens = init_screens()
-  widgets_list = widgets_list_center()
-  widgets_screen1 = widgets_left_right()
-  widgets_screen2 = widgets_left_right()
 
 def window_to_prev_group(qtile):
   if qtile.currentWindow is not None:
@@ -171,9 +161,8 @@ reconfigure_screens = True
 auto_minimize = True
 
 @hook.subscribe.startup_once
-def start_once():
-    home = os.path.expanduser("~")
-    subprocess.call([home + "/.config/qtile/autostart.sh"])
-    spawn_app_in_group("emacsclient -c -a emacs ~/org/notes.org", "Org⁴")
+def autostart():
+    home = os.path.expanduser("~/.config/qtile/autostart.sh")
+    subprocess.call([home])
 
 wmname = "LG3D"

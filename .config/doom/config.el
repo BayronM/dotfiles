@@ -44,7 +44,7 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type 'relative)
 
 
 ;; If you use `org' and don't want your org files in the default location below,
@@ -129,13 +129,7 @@
   :init
   (setq pipenv-projectile-after-switch-function #'pipenv-projectile-after-switch-extended))
 
-;; pyvenv config
-(use-package pyvenv
-  :config
-  (setq pyvenv-mode-line-indicator '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "]")))
-  )
 
-(add-hook 'pyvenv-post-activate-hooks 'lsp-restart-workspace)
 
 (after! ispell
   (setq ispell-dictionary "en")
@@ -166,7 +160,6 @@
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 (use-package org-roam
-  :ensure t
   :custom
   (org-roam-directory "~/Roam")
   :config
@@ -182,6 +175,17 @@
                    :background unspecified
                    :italic t)))
   :config
-  (setq blamer-view )
+  (setq blamer-type 'posframe-popup)
   (global-blamer-mode 1)
   )
+
+
+
+;; keybindings for org source block editing
+
+(map! :map org-mode-map
+      :leader
+      :desc "Edit source block" "e" #'org-edit-special
+      :desc "End source block" "E" #'org-edit-src-exit
+      )
+

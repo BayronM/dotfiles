@@ -52,7 +52,6 @@ font_defaults = dict(
 font_defaults = font_defaults.copy()
 font_groupbox = font_defaults.copy()
 font_groupbox["fontsize"] = 25
-font_groupbox["font"] = "Font Awesome 6 Brands"
 
 decoration_defaults = {
     "decorations": [
